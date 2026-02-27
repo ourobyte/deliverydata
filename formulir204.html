@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>CRUD Data Kurma</title>
+<style>
+body{font-family:sans-serif;max-width:520px;margin:30px auto}
+input,textarea,button,select{width:100%;margin:6px 0;padding:8px}
+pre{background:#111;color:#0f0;padding:10px}
+.row{display:flex;gap:6px}
+.row button{width:100%}
+</style>
+</head>
+<body>
+
+<h3>CRUD Produk</h3>
+
+<select id="list" onchange="loadItem()">
+  <option value="">-- pilih data --</option>
+</select>
+
+<input id="id" placeholder="ID (kurma204)">
+<input id="img" placeholder="URL Gambar">
+<input id="title" placeholder="Judul">
+<textarea id="desc" placeholder="Deskripsi"></textarea>
+<input id="price" placeholder="Harga Normal">
+<input id="promo" placeholder="Harga Promo">
+<input id="save" placeholder="Hemat">
+<input id="wa" placeholder="Link WhatsApp">
+
+<div class="row">
+  <button onclick="save()">Simpan / Update</button>
+  <button onclick="remove()">Hapus</button>
+</div>
+
+<button onclick="exportJSON()">Export JSON</button>
+
+<pre id="output"></pre>
+
+<script>
+const KEY = 'kurma-db';
+
+function db() {
+  return JSON.parse(localStorage.getItem(KEY) || '{}');
+}
+function setDB(d) {
+  localStorage.setItem(KEY, JSON.stringify(d));
+}
+
+function refreshList() {
+  const d = db();
+  list.innerHTML = '<option value="">-- pilih data --</option>';
+  Object.keys(d).forEach(k => {
+    const o = document.createElement('option');
+    o.value = k; o.textContent = k;
+    list.appendChild(o);
+  });
+}
+
+function loadItem() {
+  const d = db()[list.value];
+  if (!d) return;
+  id.value = list.value;
+  img.value = d.img;
+  title.value = d.title;
+  desc.value = d.desc;
+  price.value = d.price;
+  promo.value = d.promo;
+  save.value = d.save;
+  wa.value = d.wa;
+}
+
+function save() {
+  if (!id.value) return;
+  const d = db();
+  d[id.value] = {
+    img: img.value,
+    title: title.value,
+    desc: desc.value,
+    price: price.value,
+    promo: promo.value,
+    save: save.value,
+    wa: wa.value
+  };
+  setDB(d);
+  refreshList();
+}
+
+function remove() {
+  const d = db();
+  delete d[id.value];
+  setDB(d);
+  refreshList();
+}
+
+function exportJSON() {
+  output.textContent = JSON.stringify(db(), null, 2);
+}
+
+refreshList();
+</script>
+
+</body>
+</html>
