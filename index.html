@@ -2,55 +2,44 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>CRUD Data Kurma</title>
+<title>CRUD Produk</title>
 <style>
 body{font-family:sans-serif;max-width:520px;margin:30px auto}
 input,textarea,button,select{width:100%;margin:6px 0;padding:8px}
 pre{background:#111;color:#0f0;padding:10px}
-.row{display:flex;gap:6px}
-.row button{width:100%}
 </style>
 </head>
 <body>
 
 <h3>CRUD Produk</h3>
 
-<select id="list" onchange="loadItem()">
-  <option value="">-- pilih data --</option>
-</select>
+<select id="list" onchange="loadItem()"></select>
 
 <input id="id" placeholder="ID (kurma204)">
 <input id="img" placeholder="URL Gambar">
 <input id="title" placeholder="Judul">
 <textarea id="desc" placeholder="Deskripsi"></textarea>
-<input id="price" placeholder="Harga Normal">
-<input id="promo" placeholder="Harga Promo">
+<input id="price" placeholder="Harga">
+<input id="promo" placeholder="Promo">
 <input id="save" placeholder="Hemat">
-<input id="wa" placeholder="Link WhatsApp">
+<input id="wa" placeholder="WhatsApp">
 
-<div class="row">
-  <button onclick="save()">Simpan / Update</button>
-  <button onclick="remove()">Hapus</button>
-</div>
-
+<button onclick="save()">Simpan / Update</button>
+<button onclick="remove()">Hapus</button>
 <button onclick="exportJSON()">Export JSON</button>
 
-<pre id="output"></pre>
+<pre id="out"></pre>
 
 <script>
-const KEY = 'kurma-db';
+const KEY = 'db';
 
-function db() {
-  return JSON.parse(localStorage.getItem(KEY) || '{}');
-}
-function setDB(d) {
-  localStorage.setItem(KEY, JSON.stringify(d));
-}
+const getDB = () => JSON.parse(localStorage.getItem(KEY) || '{}');
+const setDB = d => localStorage.setItem(KEY, JSON.stringify(d));
 
-function refreshList() {
-  const d = db();
-  list.innerHTML = '<option value="">-- pilih data --</option>';
-  Object.keys(d).forEach(k => {
+function refresh() {
+  const db = getDB();
+  list.innerHTML = '<option value="">-- pilih --</option>';
+  Object.keys(db).forEach(k => {
     const o = document.createElement('option');
     o.value = k; o.textContent = k;
     list.appendChild(o);
@@ -58,7 +47,7 @@ function refreshList() {
 }
 
 function loadItem() {
-  const d = db()[list.value];
+  const d = getDB()[list.value];
   if (!d) return;
   id.value = list.value;
   img.value = d.img;
@@ -71,9 +60,8 @@ function loadItem() {
 }
 
 function save() {
-  if (!id.value) return;
-  const d = db();
-  d[id.value] = {
+  const db = getDB();
+  db[id.value] = {
     img: img.value,
     title: title.value,
     desc: desc.value,
@@ -82,23 +70,22 @@ function save() {
     save: save.value,
     wa: wa.value
   };
-  setDB(d);
-  refreshList();
+  setDB(db);
+  refresh();
 }
 
 function remove() {
-  const d = db();
-  delete d[id.value];
-  setDB(d);
-  refreshList();
+  const db = getDB();
+  delete db[id.value];
+  setDB(db);
+  refresh();
 }
 
 function exportJSON() {
-  output.textContent = JSON.stringify(db(), null, 2);
+  out.textContent = JSON.stringify(getDB(), null, 2);
 }
 
-refreshList();
+refresh();
 </script>
-
 </body>
 </html>
